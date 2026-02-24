@@ -242,6 +242,14 @@ app.get("/api/debug-db", async (req, res) => {
 });
 
 
+
+app.get("/api/debug-users", async (req, res) => {
+  const users = await prisma.user.findMany({
+    select: { email: true }
+  });
+  res.json(users);
+});
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });

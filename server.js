@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 import pkg from "@prisma/client";
 const { PrismaClient } = pkg;
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -16,6 +18,14 @@ const adapter = new PrismaPg({
 });
 
 const prisma = new PrismaClient({ adapter });
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 /* ======================
    EXPRESS SETUP
@@ -265,6 +275,71 @@ app.put(
     }
   }
 );
+
+
+
+
+
+
+app.post(
+  "/api/admin/create-user",
+  authenticateToken,
+  requireRole("ADMIN"),
+  async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email required" });
+      }
+
+      const existing = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existing) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Generate secure reset token
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const resetTokenExpiry = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
+
+      await prisma.user.create({
+        data: {
+          email,
+          resetToken,
+          resetTokenExpiry,
+        },
+      });
+
+      const resetLink = `https://noiruniversity.com/set-password?token=${resetToken}`;
+
+      await transporter.sendMail({
+        to: email,
+        subject: "Set Your Noir University Password",
+        html: `
+          <h3>Welcome to Noir University</h3>
+          <p>Click below to set your password:</p>
+          <a href="${resetLink}">${resetLink}</a>
+          <p>This link expires in 1 hour.</p>
+        `,
+      });
+
+      res.json({ message: "User created and reset email sent" });
+
+    } catch (error) {
+      console.error("Create user error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+
+
+
+
+
 
 /* ======================
    SERVER START

@@ -310,7 +310,8 @@ app.post(
 
       const resetLink = `https://noiruniversity.com/set-password?token=${resetToken}`;
 
-      await transporter.sendMail({
+      await resend.emails.send({
+        from: "Noir University <onboarding@resend.dev>",
         to: email,
         subject: "Set Your Noir University Password",
         html: `

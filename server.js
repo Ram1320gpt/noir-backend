@@ -4,10 +4,12 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import pkg from "@prisma/client";
 const { PrismaClient } = pkg;
 import { PrismaPg } from "@prisma/adapter-pg";
+import { Resend } from "resend";
+const resend = new Resend(process.env.re_DtipneGH_3paeyGj5hq34QYKW5ZDXY3ML);
+
 
 /* ======================
    DATABASE SETUP
@@ -19,15 +21,6 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter });
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // VERY IMPORTANT (false for 587)
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 /* ======================
    EXPRESS SETUP

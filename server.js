@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pkg from "@prisma/client";
 const { PrismaClient } = pkg;
@@ -148,48 +148,37 @@ app.post("/api/login", async (req, res) => {
 
 
 
-
-import bcrypt from "bcrypt";
-
-// REGISTER
 app.post("/api/register", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Missing fields" });
+      return res.status(400).json({ message: "Email and password required" });
     }
 
-    // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
+    const existing = await prisma.user.findUnique({
+      where: { email },
     });
 
-    if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
+    if (existing) {
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 12);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         email,
-        password: hashedPassword,
-        strategyAccess: false,
-        probabilityAccess: false
-      }
+        password: hashed,
+      },
     });
 
-    res.json({ message: "User created", user: { email: user.email } });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(201).json({ message: "User created", userId: user.id });
+  } catch (error) {
+    console.error("Register error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
-
 
 
 

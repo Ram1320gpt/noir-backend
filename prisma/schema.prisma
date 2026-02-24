@@ -7,16 +7,19 @@ datasource db {
 }
 
 model User {
-  id                     String   @id @default(uuid())
-  email                  String   @unique
-  password               String
-  role                   Role     @default(MEMBER)
-  isActive               Boolean  @default(true)
+  id                         String   @id @default(uuid())
+  email                      String   @unique
+  password                   String?   // optional until user sets it
+  role                       Role     @default(MEMBER)
+  isActive                   Boolean  @default(true)
 
-  hasStrategyTracking    Boolean  @default(false)
-  hasProbabilityCalculator Boolean @default(false)
+  hasStrategyTracking        Boolean  @default(false)
+  hasProbabilityCalculator   Boolean  @default(false)
 
-  createdAt              DateTime @default(now())
+  resetToken                 String?
+  resetTokenExpiry           DateTime?
+
+  createdAt                  DateTime @default(now())
 }
 
 enum Role {

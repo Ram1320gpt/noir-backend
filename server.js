@@ -144,6 +144,60 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+
+
+
+
+
+import bcrypt from "bcrypt";
+
+// REGISTER
+app.post("/api/register", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        strategyAccess: false,
+        probabilityAccess: false
+      }
+    });
+
+    res.json({ message: "User created", user: { email: user.email } });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+
+
+
+
+
+
+
 /* ======================
    PROTECTED ROUTES
 ====================== */

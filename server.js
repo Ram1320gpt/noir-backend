@@ -10,6 +10,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+console.log("RESEND KEY EXISTS:", !!process.env.RESEND_API_KEY);
 
 /* ======================
    DATABASE SETUP
@@ -310,7 +311,7 @@ app.post(
 
       const resetLink = `https://noiruniversity.com/set-password?token=${resetToken}`;
 
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: "Noir University <onboarding@resend.dev>",
         to: email,
         subject: "Set Your Noir University Password",
@@ -322,6 +323,7 @@ app.post(
         `,
       });
 
+      console.log("Resend result:", result);
       res.json({ message: "User created and reset email sent" });
 
     } catch (error) {

@@ -405,29 +405,60 @@ app.get(
 );
 
 
-app.delete("/api/admin/delete-member", authenticateToken, requireRole("ADMIN"), async (req, res) => {
-  try {
+
+
+
+
+
+
+app.delete(
+  "/api/admin/delete-member",
+  authenticateToken,
+  requireRole("ADMIN"),
+  async (req, res) => {
+
     const { email } = req.body;
 
-    const existing = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (!existing) {
-      return res.status(404).json({ message: "User not found" });
+    if (!email) {
+      return res.status(400).json({ message: "Email required" });
     }
 
-    await prisma.user.delete({
-      where: { email }
-    });
+    try {
 
-    res.json({ message: "Deleted successfully" });
+      const user = await prisma.user.findUnique({
+        where: { email }
+      });
 
-  } catch (error) {
-    console.error("Delete member error:", error);
-    res.status(500).json({ message: "Server error" });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // 🔒 Prevent deleting admins
+      if (user.role === "ADMIN") {
+        return res.status(403).json({
+          message: "Cannot delete admin users"
+        });
+      }
+
+      // 🔒 Prevent admin deleting themselves
+      if (user.id === req.user.id) {
+        return res.status(403).json({
+          message: "You cannot delete your own account"
+        });
+      }
+
+      await prisma.user.delete({
+        where: { email }
+      });
+
+      res.json({ message: "User deleted successfully" });
+
+    } catch (error) {
+      console.error("Delete error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
   }
-});
+);
 
 
 

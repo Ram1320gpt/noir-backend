@@ -405,7 +405,23 @@ app.get(
 );
 
 
+/* 🔥 PLACE DELETE ROUTE HERE */
 
+app.delete("/api/admin/delete-member", authenticateToken, requireRole("ADMIN"), async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    await prisma.user.delete({
+      where: { email }
+    });
+
+    res.json({ message: "Deleted successfully" });
+
+  } catch (error) {
+    console.error("Delete member error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 

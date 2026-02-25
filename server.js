@@ -8,7 +8,7 @@ import pkg from "@prisma/client";
 const { PrismaClient } = pkg;
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Resend } from "resend";
-const resend = new Resend(process.env.re_DtipneGH_3paeyGj5hq34QYKW5ZDXY3ML);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 /* ======================

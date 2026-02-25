@@ -273,6 +273,38 @@ app.put(
 );
 
 
+app.delete(
+  "/api/admin/delete-member",
+  authenticateToken,
+  requireRole("ADMIN"),
+  async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      const user = await prisma.user.findUnique({
+        where: { email }
+      });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role === "ADMIN") {
+        return res.status(403).json({ message: "Cannot delete admin user" });
+      }
+
+      await prisma.user.delete({
+        where: { email }
+      });
+
+      res.json({ message: "Deleted successfully" });
+
+    } catch (error) {
+      console.error("Delete member error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
 
 
 

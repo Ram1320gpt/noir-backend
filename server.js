@@ -405,11 +405,17 @@ app.get(
 );
 
 
-/* 🔥 PLACE DELETE ROUTE HERE */
-
 app.delete("/api/admin/delete-member", authenticateToken, requireRole("ADMIN"), async (req, res) => {
   try {
     const { email } = req.body;
+
+    const existing = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     await prisma.user.delete({
       where: { email }

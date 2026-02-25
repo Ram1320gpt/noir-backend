@@ -389,6 +389,7 @@ app.get(
         select: {
           id: true,
           email: true,
+          role: true, // ✅ important
           hasStrategyTracking: true,
           hasProbabilityCalculator: true,
           createdAt: true,

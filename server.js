@@ -308,6 +308,58 @@ app.post(
           resetTokenExpiry,
         },
       });
+      
+
+      app.post("/api/set-password", async (req, res) => {
+       try {
+        const { token, password } = req.body;
+
+        if (!token || !password) {
+         return res.status(400).json({ message: "Token and password required" });
+        }
+
+        const user = await prisma.user.findFirst({
+          where: {
+           resetToken: token,
+           resetTokenExpiry: {
+             gt: new Date(),
+            },
+          },
+        });
+
+        if (!user) {
+          return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        const hashed = await bcrypt.hash(password, 12);
+
+        await prisma.user.update({
+        where: { id: user.id },
+        data: {
+         password: hashed,
+         resetToken: null,
+         resetTokenExpiry: null,
+        },
+      });
+
+    res.json({ message: "Password set successfully" });
+
+  } catch (error) {
+    console.error("Set password error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
 
       const resetLink = `https://noiruniversity.com/set-password?token=${resetToken}`;
 

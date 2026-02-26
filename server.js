@@ -152,6 +152,69 @@ app.post("/api/login", async (req, res) => {
 
 
 
+/* ======================
+   FORGET PASSWORD
+====================== */
+
+
+
+app.post("/api/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email required" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    // Don't reveal if user exists (security best practice)
+    if (!user) {
+      return res.json({ message: "If email exists, reset link sent" });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpiry = new Date(Date.now() + 1000 * 60 * 60);
+
+    await prisma.user.update({
+      where: { email },
+      data: {
+        resetToken,
+        resetTokenExpiry
+      }
+    });
+
+    const resetLink = `https://noiruniversity.com/set-password?token=${resetToken}`;
+
+    await resend.emails.send({
+      from: "Noir University <noreply@access.noiruniversity.com>",
+      to: email,
+      subject: "Reset Your Password",
+      html: `
+        <h3>Password Reset Request</h3>
+        <p>Click below to reset your password:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>This link expires in 1 hour.</p>
+      `
+    });
+
+    res.json({ message: "If email exists, reset link sent" });
+
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+
+
+
+
+
 
 
 app.post("/api/register", async (req, res) => {

@@ -411,31 +411,19 @@ app.post("/api/set-password", async (req, res) => {
 
 
 
-app.get(
-  "/api/admin/members",
-  authenticateToken,
-  requireRole("ADMIN"),
-  async (req, res) => {
-    try {
-      const users = await prisma.user.findMany({
-        select: {
-          id: true,
-          email: true,
-          role: true, // ✅ important
-          hasStrategyTracking: true,
-          hasProbabilityCalculator: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: "desc" }
-      });
-
-      res.json(users);
-    } catch (error) {
-      console.error("Fetch members error:", error);
-      res.status(500).json({ message: "Server error" });
-    }
-  }
-);
+const users = await prisma.user.findMany({
+  where: {
+    role: "USER"   // 👈 THIS LINE PREVENTS ADMIN FROM BEING RETURNED
+  },
+  select: {
+    id: true,
+    email: true,
+    hasStrategyTracking: true,
+    hasProbabilityCalculator: true,
+    createdAt: true,
+  },
+  orderBy: { createdAt: "desc" }
+});
 
 
 

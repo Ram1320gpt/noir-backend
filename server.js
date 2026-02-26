@@ -432,54 +432,31 @@ const users = await prisma.user.findMany({
 
 
 
-app.delete(
-  "/api/admin/delete-member",
+app.delete("/api/admin/delete-member",
   authenticateToken,
   requireRole("ADMIN"),
   async (req, res) => {
 
     const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email required" });
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    try {
-
-      const user = await prisma.user.findUnique({
-        where: { email }
-      });
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // 🔒 Prevent deleting admins
-      if (user.role === "ADMIN") {
-        return res.status(403).json({
-          message: "Cannot delete admin users"
-        });
-      }
-
-      // 🔒 Prevent admin deleting themselves
-      if (user.id === req.user.id) {
-        return res.status(403).json({
-          message: "You cannot delete your own account"
-        });
-      }
-
-      await prisma.user.delete({
-        where: { email }
-      });
-
-      res.json({ message: "User deleted successfully" });
-
-    } catch (error) {
-      console.error("Delete error:", error);
-      res.status(500).json({ message: "Server error" });
+    if (user.role === "ADMIN") {
+      return res.status(403).json({ message: "Cannot delete admin" });
     }
-  }
-);
+
+    await prisma.user.delete({
+      where: { email }
+    });
+
+    res.json({ message: "Deleted" });
+});
 
 
 

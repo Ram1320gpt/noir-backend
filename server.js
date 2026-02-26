@@ -197,6 +197,9 @@ app.post("/api/register", async (req, res) => {
    PROTECTED ROUTES
 ====================== */
 
+
+
+
 app.get("/api/student", authenticateToken, (req, res) => {
   res.json({
     message: "Student dashboard",
@@ -262,6 +265,31 @@ app.get(
     }
   }
 );
+
+
+
+
+
+app.get(
+  "/api/admin",
+  authenticateToken,
+  requireRole("ADMIN"),
+  (req, res) => {
+    res.json({
+      message: "Admin dashboard",
+      user: req.user,
+    });
+  }
+);
+
+
+
+
+
+
+
+
+
 
 /* ======================
    ADMIN CONTROL API

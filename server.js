@@ -229,14 +229,37 @@ app.get(
 );
 
 app.get(
-  "/api/admin",
+  "/api/admin/members",
   authenticateToken,
   requireRole("ADMIN"),
-  (req, res) => {
-    res.json({
-      message: "Admin dashboard",
-      user: req.user,
-    });
+  async (req, res) => {
+    try {
+
+      const users = await prisma.user.findMany({
+        where: {
+          role: {
+            not: "ADMIN"
+          }
+        },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          hasStrategyTracking: true,
+          hasProbabilityCalculator: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc"
+        }
+      });
+
+      res.json(users);
+
+    } catch (error) {
+      console.error("Fetch members error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
   }
 );
 
@@ -411,55 +434,7 @@ app.post("/api/set-password", async (req, res) => {
 
 
 
-const users = await prisma.user.findMany({
-  where: {
-    role: {
-      not: "ADMIN"
-    }
-  },
-  select: {
-    id: true,
-    email: true,
-    role: true,
-    hasStrategyTracking: true,
-    hasProbabilityCalculator: true,
-    createdAt: true,
-  },
-  orderBy: { createdAt: "desc" }
-});
 
-
-
-
-
-
-
-
-app.delete("/api/admin/delete-member",
-  authenticateToken,
-  requireRole("ADMIN"),
-  async (req, res) => {
-
-    const { email } = req.body;
-
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (user.role === "ADMIN") {
-      return res.status(403).json({ message: "Cannot delete admin" });
-    }
-
-    await prisma.user.delete({
-      where: { email }
-    });
-
-    res.json({ message: "Deleted" });
-});
 
 
 

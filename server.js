@@ -525,6 +525,36 @@ app.get("/api/debug-users", async (req, res) => {
   res.json(users);
 });
 
+
+
+/* ======================
+   TEMP: PROMOTE ADMIN
+====================== */
+
+app.get("/api/make-admin", async (req, res) => {
+  try {
+    const user = await prisma.user.update({
+      where: { email: "shadowbear345@gmail.com" },
+      data: { role: "ADMIN" }
+    });
+
+    res.json({ message: "User promoted to ADMIN", user });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error promoting user" });
+  }
+});
+
+
+
+
+
+
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+

@@ -413,11 +413,14 @@ app.post("/api/set-password", async (req, res) => {
 
 const users = await prisma.user.findMany({
   where: {
-    role: "USER"   // 👈 THIS LINE PREVENTS ADMIN FROM BEING RETURNED
+    role: {
+      not: "ADMIN"
+    }
   },
   select: {
     id: true,
     email: true,
+    role: true,
     hasStrategyTracking: true,
     hasProbabilityCalculator: true,
     createdAt: true,

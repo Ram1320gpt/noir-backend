@@ -608,19 +608,22 @@ app.post("/api/support", async (req, res) => {
       return res.status(400).json({ message: "All fields required" });
     }
 
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: "Noir University <noiruniversityaccess@gmail.com>",
-      to: "annakkili979@gmail.com", // 🔁 CHANGE TO YOUR REAL SUPPORT EMAIL
+      to: "annakkili979@gmail.com",
+      reply_to: email,
       subject: `Support Request: ${subject}`,
       html: `
         <h3>New Support Message</h3>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Subject:</strong> ${subject}</p>
-        <hr />
+        <hr/>
         <p>${message}</p>
       `
     });
+
+    console.log("Support email result:", result);
 
     res.json({ message: "Message sent successfully" });
 

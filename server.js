@@ -524,6 +524,112 @@ app.post("/api/set-password", async (req, res) => {
 
 
 
+/* ======================
+   SUPPORT CONTACT API
+====================== */
+
+app.post("/api/support", async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    await resend.emails.send({
+      from: "Noir University <support@access.noiruniversity.com>",
+      to: "support@noiruniversity.com", // 🔁 CHANGE TO YOUR REAL SUPPORT EMAIL
+      subject: `Support Request: ${subject}`,
+      html: `
+        <h3>New Support Message</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <hr />
+        <p>${message}</p>
+      `
+    });
+
+    res.json({ message: "Message sent successfully" });
+
+  } catch (error) {
+    console.error("Support error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});/* ======================
+   SUPPORT CONTACT API
+====================== */
+
+app.post("/api/support", async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    await resend.emails.send({
+      from: "Noir University <support@access.noiruniversity.com>",
+      to: "support@noiruniversity.com", // 🔁 CHANGE TO YOUR REAL SUPPORT EMAIL
+      subject: `Support Request: ${subject}`,
+      html: `
+        <h3>New Support Message</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <hr />
+        <p>${message}</p>
+      `
+    });
+
+    res.json({ message: "Message sent successfully" });
+
+  } catch (error) {
+    console.error("Support error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+
+
+
+
+/* ======================
+   SUPPORT CONTACT API
+====================== */
+
+app.post("/api/support", async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    await resend.emails.send({
+      from: "Noir University <support@access.noiruniversity.com>",
+      to: "support@noiruniversity.com", // 🔁 CHANGE TO YOUR REAL SUPPORT EMAIL
+      subject: `Support Request: ${subject}`,
+      html: `
+        <h3>New Support Message</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <hr />
+        <p>${message}</p>
+      `
+    });
+
+    res.json({ message: "Message sent successfully" });
+
+  } catch (error) {
+    console.error("Support error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 
 

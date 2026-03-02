@@ -609,7 +609,7 @@ app.post("/api/support", async (req, res) => {
     }
 
     const result = await resend.emails.send({
-      from: "Noir University <noiruniversityaccess@gmail.com>",
+      from: "Noir University <support@access.noiruniversity.com>",
       to: "annakkili979@gmail.com",
       reply_to: email,
       subject: `Support Request: ${subject}`,

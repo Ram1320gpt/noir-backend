@@ -610,7 +610,7 @@ app.post("/api/support", async (req, res) => {
 
     await resend.emails.send({
       from: "Noir University <support@access.noiruniversity.com>",
-      to: "support@forexnetworktrading.com", // 🔁 CHANGE TO YOUR REAL SUPPORT EMAIL
+      to: "annakkili979@gmail.com", // 🔁 CHANGE TO YOUR REAL SUPPORT EMAIL
       subject: `Support Request: ${subject}`,
       html: `
         <h3>New Support Message</h3>
